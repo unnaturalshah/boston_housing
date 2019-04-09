@@ -8,7 +8,7 @@ Any steps to a model is to understand data, please refer to housing.csv and use 
 
 Next, you could reference boston_project.ipny to understand the actions I took from downloading, understanding, and partioning the data for the model to developing, training, and validating the model to testing on a sample of data to evaluate model performance. 
 
-Technically, you need certain python libraries such as [numpy](https://github.com/numpy/numpy), [pandas](https://github.com/pandas-dev/pandas), visuals.py (provided), [matplotlib](), [sklearn / schikit-learn](https://github.com/scikit-learn/scikit-learn)
+Technically, you need certain python libraries such as [numpy](https://github.com/numpy/numpy), [pandas](https://github.com/pandas-dev/pandas), visuals.py (provided), [matplotlib](), [sklearn / scikit-learn](https://github.com/scikit-learn/scikit-learn)
 
 ## **Why does this all matter?**
 
