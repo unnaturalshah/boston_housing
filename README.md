@@ -29,5 +29,10 @@ Your guess was as best as mine when I started this project so I won't share the 
 
 What if boston_housing.ipny is not loading? Try downloading the file and running Jupyter Notebook.
 
-
+How do I read housing.csv?
+There are 489 rows and 4 columns in this file. The last column is the target variable and the top 3 are attributes.
+    RM: average number of rooms per dwelling
+    LSTAT: percentage of population considered lower status
+    PTRATIO: pupil-teacher ratio by town
+    MEDV: median value of owner-occupied homes
 
