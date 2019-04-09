@@ -10,6 +10,12 @@ Next, you could reference boston_project.ipny to understand the actions I took f
 
 Technically, you need certain python libraries such as [numpy](https://github.com/numpy/numpy), [pandas](https://github.com/pandas-dev/pandas), visuals.py (provided), [matplotlib](), [sklearn / scikit-learn](https://github.com/scikit-learn/scikit-learn)
 
+Need a software installed to run and execute a Jupyter Notebook
+
+If you do not have Python installed yet, it is highly recommended that you install the Anaconda distribution of Python, which already has the above packages and more included. 
+
+For main sauce of files click on this [Udacity ML GitHub](https://github.com/udacity/machine-learning/tree/master/projects/boston_housing)
+
 ## **Why does this all matter?**
 
 This was the 1st project from Udacity's machine learning nanodegree course which sets you to familarize how the rest of the course will go to this readMe on github. This helped me also understand the syntax and various important libs to python in deploying a model.
