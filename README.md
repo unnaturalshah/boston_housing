@@ -15,9 +15,13 @@ Technically, you need certain python libraries such as [numpy](https://github.co
 This was the 1st project from Udacity's machine learning nanodegree course which sets you to familarize how the rest of the course will go to this readMe on github. This helped me also understand the syntax and various important libs to python in deploying a model.
 
 
-
 ## What is this visuals.py file?
 
-Your guess was as best as mine when I started this project so I won't share the secret just yet. Peak inside boston_project.ipny as to why this matters and here is the hint it imports supplementary visualizations.
+Your guess was as best as mine when I started this project so I won't share the secret just yet. No really, this was a supplementary file with the project. Peak inside boston_project.ipny as to why this matters and here is the hint it imports supplementary visualizations.
+
+## FAQ
+
+What if boston_housing.ipny is not loading? Try downloading the file and running Jupyter Notebook.
+
 
 
