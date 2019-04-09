@@ -1,10 +1,10 @@
 # Boston Housing Project
 
-Goal is to build a trained model on [Boston Hosing Data](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/) that predicts monetary value given certain input attributes such as total number of rooms, neighborhood poverty level, student-teacher ratio of nearby schools, etc.
+Goal is to build a trained model on [Boston Hosing Data](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/) that predicts monetary value given three input attributes; total number of rooms, neighborhood poverty level, and student-teacher ratio of nearby schools
 
 ## How to read the files in this project?
 
-Any steps to a model is to understand data, please refer to housing.csv and use this [UCI link](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) to learn more about how the data was put together.
+Any steps to a model is to understand data, please refer to 'housing.csv' and use this [UCI link](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) to learn more about the data and its history.
 
 Next, you could reference boston_project.ipny to understand the actions I took from downloading, understanding, and partioning the data for the model to developing, training, and validating the model to testing on a sample of data to evaluate model performance. 
 
