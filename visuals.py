@@ -1,270 +1,130 @@
-<!DOCTYPE HTML>
-<html>
+###########################################
+# Suppress matplotlib user warnings
+# Necessary for newer version of matplotlib
+import warnings
+warnings.filterwarnings("ignore", category = UserWarning, module = "matplotlib")
+#
+# Display inline matplotlib plots with IPython
+from IPython import get_ipython
+get_ipython().run_line_magic('matplotlib', 'inline')
+###########################################
 
-<head>
-    <meta charset="utf-8">
+import matplotlib.pyplot as pl
+import numpy as np
+import sklearn.learning_curve as curves
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.cross_validation import ShuffleSplit, train_test_split
 
-    <title>visuals.py (editing)</title>
-    <link id="favicon" rel="shortcut icon" type="image/x-icon" href="/static/base/images/favicon-file.ico?v=e2776a7f45692c839d6eea7d7ff6f3b2">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="stylesheet" href="/static/components/jquery-ui/themes/smoothness/jquery-ui.min.css?v=3c2a865c832a1322285c55c6ed99abb2" type="text/css" />
-    <link rel="stylesheet" href="/static/components/jquery-typeahead/dist/jquery.typeahead.min.css?v=7afb461de36accb1aa133a1710f5bc56" type="text/css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+def ModelLearning(X, y):
+    """ Calculates the performance of several models with varying sizes of training data.
+        The learning and testing scores for each model are then plotted. """
     
+    # Create 10 cross-validation sets for training and testing
+    cv = ShuffleSplit(X.shape[0], n_iter = 10, test_size = 0.2, random_state = 0)
+
+    # Generate the training set sizes increasing by 50
+    train_sizes = np.rint(np.linspace(1, X.shape[0]*0.8 - 1, 9)).astype(int)
+
+    # Create the figure window
+    fig = pl.figure(figsize=(10,7))
+
+    # Create three different models based on max_depth
+    for k, depth in enumerate([1,3,6,10]):
+        
+        # Create a Decision tree regressor at max_depth = depth
+        regressor = DecisionTreeRegressor(max_depth = depth)
+
+        # Calculate the training and testing scores
+        sizes, train_scores, test_scores = curves.learning_curve(regressor, X, y, \
+            cv = cv, train_sizes = train_sizes, scoring = 'r2')
+        
+        # Find the mean and standard deviation for smoothing
+        train_std = np.std(train_scores, axis = 1)
+        train_mean = np.mean(train_scores, axis = 1)
+        test_std = np.std(test_scores, axis = 1)
+        test_mean = np.mean(test_scores, axis = 1)
+
+        # Subplot the learning curve 
+        ax = fig.add_subplot(2, 2, k+1)
+        ax.plot(sizes, train_mean, 'o-', color = 'r', label = 'Training Score')
+        ax.plot(sizes, test_mean, 'o-', color = 'g', label = 'Testing Score')
+        ax.fill_between(sizes, train_mean - train_std, \
+            train_mean + train_std, alpha = 0.15, color = 'r')
+        ax.fill_between(sizes, test_mean - test_std, \
+            test_mean + test_std, alpha = 0.15, color = 'g')
+        
+        # Labels
+        ax.set_title('max_depth = %s'%(depth))
+        ax.set_xlabel('Number of Training Points')
+        ax.set_ylabel('Score')
+        ax.set_xlim([0, X.shape[0]*0.8])
+        ax.set_ylim([-0.05, 1.05])
     
-<link rel="stylesheet" href="/static/components/codemirror/lib/codemirror.css?v=288352df06a67ee35003b0981da414ac">
-<link rel="stylesheet" href="/static/components/codemirror/addon/dialog/dialog.css?v=c89dce10b44d2882a024e7befc2b63f5">
+    # Visual aesthetics
+    ax.legend(bbox_to_anchor=(1.05, 2.05), loc='lower left', borderaxespad = 0.)
+    fig.suptitle('Decision Tree Regressor Learning Performances', fontsize = 16, y = 1.03)
+    fig.tight_layout()
+    fig.show()
 
-    <link rel="stylesheet" href="/static/style/style.min.css?v=4b4b8cb1e49605137f77fed041f8922b" type="text/css"/>
+
+def ModelComplexity(X, y):
+    """ Calculates the performance of the model as model complexity increases.
+        The learning and testing errors rates are then plotted. """
     
+    # Create 10 cross-validation sets for training and testing
+    cv = ShuffleSplit(X.shape[0], n_iter = 10, test_size = 0.2, random_state = 0)
 
-    <link rel="stylesheet" href="/custom/custom.css" type="text/css" />
-    <script src="/static/components/es6-promise/promise.min.js?v=f004a16cb856e0ff11781d01ec5ca8fe" type="text/javascript" charset="utf-8"></script>
-    <script src="/static/components/preact/index.js?v=00a2fac73c670ce39ac53d26640eb542" type="text/javascript"></script>
-    <script src="/static/components/proptypes/index.js?v=c40890eb04df9811fcc4d47e53a29604" type="text/javascript"></script>
-    <script src="/static/components/preact-compat/index.js?v=aea8f6660e54b18ace8d84a9b9654c1c" type="text/javascript"></script>
-    <script src="/static/components/requirejs/require.js?v=951f856e81496aaeec2e71a1c2c0d51f" type="text/javascript" charset="utf-8"></script>
-    <script>
-      require.config({
-          
-          urlArgs: "v=20181105023550",
-          
-          baseUrl: '/static/',
-          paths: {
-            'auth/js/main': 'auth/js/main.min',
-            custom : '/custom',
-            nbextensions : '/nbextensions',
-            kernelspecs : '/kernelspecs',
-            underscore : 'components/underscore/underscore-min',
-            backbone : 'components/backbone/backbone-min',
-            jed: 'components/jed/jed',
-            jquery: 'components/jquery/jquery.min',
-            json: 'components/requirejs-plugins/src/json',
-            text: 'components/requirejs-text/text',
-            bootstrap: 'components/bootstrap/js/bootstrap.min',
-            bootstraptour: 'components/bootstrap-tour/build/js/bootstrap-tour.min',
-            'jquery-ui': 'components/jquery-ui/jquery-ui.min',
-            moment: 'components/moment/min/moment-with-locales',
-            codemirror: 'components/codemirror',
-            termjs: 'components/xterm.js/xterm',
-            typeahead: 'components/jquery-typeahead/dist/jquery.typeahead.min',
-          },
-          map: { // for backward compatibility
-              "*": {
-                  "jqueryui": "jquery-ui",
-              }
-          },
-          shim: {
-            typeahead: {
-              deps: ["jquery"],
-              exports: "typeahead"
-            },
-            underscore: {
-              exports: '_'
-            },
-            backbone: {
-              deps: ["underscore", "jquery"],
-              exports: "Backbone"
-            },
-            bootstrap: {
-              deps: ["jquery"],
-              exports: "bootstrap"
-            },
-            bootstraptour: {
-              deps: ["bootstrap"],
-              exports: "Tour"
-            },
-            "jquery-ui": {
-              deps: ["jquery"],
-              exports: "$"
-            }
-          },
-          waitSeconds: 30,
-      });
+    # Vary the max_depth parameter from 1 to 10
+    max_depth = np.arange(1,11)
 
-      require.config({
-          map: {
-              '*':{
-                'contents': 'services/contents',
-              }
-          }
-      });
+    # Calculate the training and testing scores
+    train_scores, test_scores = curves.validation_curve(DecisionTreeRegressor(), X, y, \
+        param_name = "max_depth", param_range = max_depth, cv = cv, scoring = 'r2')
 
-      // error-catching custom.js shim.
-      define("custom", function (require, exports, module) {
-          try {
-              var custom = require('custom/custom');
-              console.debug('loaded custom.js');
-              return custom;
-          } catch (e) {
-              console.error("error loading custom.js", e);
-              return {};
-          }
-      })
+    # Find the mean and standard deviation for smoothing
+    train_mean = np.mean(train_scores, axis=1)
+    train_std = np.std(train_scores, axis=1)
+    test_mean = np.mean(test_scores, axis=1)
+    test_std = np.std(test_scores, axis=1)
 
-    document.nbjs_translations = {"domain": "nbjs", "locale_data": {"nbjs": {"": {"domain": "nbjs"}}}};
-    document.documentElement.lang = navigator.language.toLowerCase();
-    </script>
-
+    # Plot the validation curve
+    pl.figure(figsize=(7, 5))
+    pl.title('Decision Tree Regressor Complexity Performance')
+    pl.plot(max_depth, train_mean, 'o-', color = 'r', label = 'Training Score')
+    pl.plot(max_depth, test_mean, 'o-', color = 'g', label = 'Validation Score')
+    pl.fill_between(max_depth, train_mean - train_std, \
+        train_mean + train_std, alpha = 0.15, color = 'r')
+    pl.fill_between(max_depth, test_mean - test_std, \
+        test_mean + test_std, alpha = 0.15, color = 'g')
     
-    
-
-</head>
-
-<body class="edit_app "
- 
-data-base-url="/"
-data-file-path="visuals.py"
-
-  
- 
-
-dir="ltr">
-
-<noscript>
-    <div id='noscript'>
-      Jupyter Notebook requires JavaScript.<br>
-      Please enable it to proceed. 
-  </div>
-</noscript>
-
-<div id="header">
-  <div id="header-container" class="container">
-  <div id="ipython_notebook" class="nav navbar-brand"><a href="/tree" title='dashboard'>
-      <img src='/static/base/images/logo.png?v=641991992878ee24c6f3826e81054a0f' alt='Jupyter Notebook'/>
-  </a></div>
-
-  
-
-<span id="save_widget" class="pull-left save_widget">
-    <span class="filename"></span>
-    <span class="last_modified"></span>
-</span>
+    # Visual aesthetics
+    pl.legend(loc = 'lower right')
+    pl.xlabel('Maximum Depth')
+    pl.ylabel('Score')
+    pl.ylim([-0.05,1.05])
+    pl.show()
 
 
-  
-  
-  
-  
+def PredictTrials(X, y, fitter, data):
+    """ Performs trials of fitting and predicting data. """
 
-    <span id="login_widget">
-      
-    </span>
+    # Store the predicted prices
+    prices = []
 
-  
+    for k in range(10):
+        # Split the data
+        X_train, X_test, y_train, y_test = train_test_split(X, y, \
+            test_size = 0.2, random_state = k)
+        
+        # Fit the data
+        reg = fitter(X_train, y_train)
+        
+        # Make a prediction
+        pred = reg.predict([data[0]])[0]
+        prices.append(pred)
+        
+        # Result
+        print("Trial {}: ${:,.2f}".format(k+1, pred))
 
-  
-  
-  </div>
-  <div class="header-bar"></div>
-
-  
-
-<div id="menubar-container" class="container">
-  <div id="menubar">
-    <div id="menus" class="navbar navbar-default" role="navigation">
-      <div class="container-fluid">
-          <p  class="navbar-text indicator_area">
-          <span id="current-mode" >current mode</span>
-          </p>
-        <button type="button" class="btn btn-default navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-          <i class="fa fa-bars"></i>
-          <span class="navbar-text">Menu</span>
-        </button>
-        <ul class="nav navbar-nav navbar-right">
-          <li id="notification_area"></li>
-        </ul>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">File</a>
-              <ul id="file-menu" class="dropdown-menu">
-                <li id="new-file"><a href="#">New</a></li>
-                <li id="save-file"><a href="#">Save</a></li>
-                <li id="rename-file"><a href="#">Rename</a></li>
-                <li id="download-file"><a href="#">Download</a></li>
-              </ul>
-            </li>
-            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Edit</a>
-              <ul id="edit-menu" class="dropdown-menu">
-                <li id="menu-find"><a href="#">Find</a></li>
-                <li id="menu-replace"><a href="#">Find &amp; Replace</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Key Map</li>
-                <li id="menu-keymap-default"><a href="#">Default<i class="fa"></i></a></li>
-                <li id="menu-keymap-sublime"><a href="#">Sublime Text<i class="fa"></i></a></li>
-                <li id="menu-keymap-vim"><a href="#">Vim<i class="fa"></i></a></li>
-                <li id="menu-keymap-emacs"><a href="#">emacs<i class="fa"></i></a></li>
-              </ul>
-            </li>
-            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">View</a>
-              <ul id="view-menu" class="dropdown-menu">
-              <li id="toggle_header" title="Show/Hide the logo and notebook title (above menu bar)">
-              <a href="#">Toggle Header</a></li>
-              <li id="menu-line-numbers"><a href="#">Toggle Line Numbers</a></li>
-              </ul>
-            </li>
-            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Language</a>
-              <ul id="mode-menu" class="dropdown-menu">
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="lower-header-bar"></div>
-
-
-</div>
-
-<div id="site">
-
-
-<div id="texteditor-backdrop">
-<div id="texteditor-container" class="container"></div>
-</div>
-
-
-</div>
-
-
-
-
-
-
-    
-
-
-<script src="/static/edit/js/main.min.js?v=ac978ed627b00fbfa328acc3f14b22fb" type="text/javascript" charset="utf-8"></script>
-
-
-<script type='text/javascript'>
-  function _remove_token_from_url() {
-    if (window.location.search.length <= 1) {
-      return;
-    }
-    var search_parameters = window.location.search.slice(1).split('&');
-    for (var i = 0; i < search_parameters.length; i++) {
-      if (search_parameters[i].split('=')[0] === 'token') {
-        // remote token from search parameters
-        search_parameters.splice(i, 1);
-        var new_search = '';
-        if (search_parameters.length) {
-          new_search = '?' + search_parameters.join('&');
-        }
-        var new_url = window.location.origin + 
-                      window.location.pathname + 
-                      new_search + 
-                      window.location.hash;
-        window.history.replaceState({}, "", new_url);
-        return;
-      }
-    }
-  }
-  _remove_token_from_url();
-</script>
-</body>
-
-</html>
+    # Display price range
+    print("\nRange in prices: ${:,.2f}".format(max(prices) - min(prices)))
